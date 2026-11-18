@@ -1,0 +1,1 @@
+docker exec -u mosquitto -it mqtt5 sh -c 'mosquitto_passwd -b /mosquitto/config/pwfile USER PASS; kill -SIGHUP $(cat /mosquitto/pid)'
