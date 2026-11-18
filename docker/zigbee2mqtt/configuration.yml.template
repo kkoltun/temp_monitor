@@ -8,7 +8,7 @@ serial:
   port: /dev/ttyACM0
   adapter: zstack
 advanced:
-  channel: 11
+  channel: [WRITE_HERE]
   network_key: GENERATE
   pan_id: GENERATE
   ext_pan_id: GENERATE

@@ -3,8 +3,8 @@
 ## Status
 
 * Work in progress.
-* Last done: MQTT broker running.
-* Next: One sensor end to end.
+* Last done: sensor paired.
+* Next: simple app development.
 
 ## General
 
