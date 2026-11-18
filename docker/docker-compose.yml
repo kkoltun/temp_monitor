@@ -1,4 +1,18 @@
 services:
+  zigbee2mqtt:
+    image: ghcr.io/koenkk/zigbee2mqtt
+    container_name: zigbee2mqtt
+    ports:
+      - "8123:8080"
+    devices:
+      - ${DONGLE_PATH}:/dev/ttyACM0
+    volumes:
+      - zigbee2mqtt-data:/app/data
+      - ./zigbee2mqtt/configuration.yml:/app/data/configuration.yaml:rw
+      - /run/udev:/run/udev:ro
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Warsaw
   # mqtt5 eclipse-mosquitto
   mqtt5:
     image: eclipse-mosquitto
@@ -7,9 +21,9 @@ services:
       - "1883:1883" #default mqtt port
       - "9001:9001" #default mqtt port for websockets
     volumes:
-      - config:/mosquitto/config:rw
-      - data:/mosquitto/data:rw
-      - log:/mosquitto/log:rw
+      - mqtt5-config:/mosquitto/config:rw
+      - mqtt5-data:/mosquitto/data:rw
+      - mqtt5-log:/mosquitto/log:rw
       - ./mqtt5/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
     restart: unless-stopped
     pre_start:
@@ -18,9 +32,10 @@ services:
 
 # volumes for mapping data,config and log
 volumes:
-  config:
-  data:
-  log:
+  mqtt5-config:
+  mqtt5-data:
+  mqtt5-log:
+  zigbee2mqtt-data:
 
 networks:
   default:

@@ -1,1 +1,1 @@
-docker exec -u mosquitto -it mqtt5 sh -c 'mosquitto_passwd -b /mosquitto/config/pwfile USER PASS; kill -SIGHUP $(cat /mosquitto/pid)'
+docker exec -u mosquitto -it mqtt5 sh -c 'mosquitto_passwd -b /mosquitto/config/pwfile zigbee2mqtt [WRITE_HERE_ZIGBEE2MQTT_PASSWORD]; mosquitto_passwd -b /mosquitto/config/pwfile app [WRITE_HERE_APP_PASSWORD]; kill -SIGHUP $(cat /mosquitto/pid)'

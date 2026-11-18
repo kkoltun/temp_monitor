@@ -20,7 +20,8 @@ Key flow: Zigbee sensors -> Zigbee2MQTT -> MQTT -> Kotlin app.
 
 ## How to run
 
-1. Turn the file `./docker/mqtt5/create_user.sh.template` into a ready-to-use `create_user.sh` with your credentials.
+1. Look for files `*.template` and turn them into real config files by removing the template suffix. To make sure
+   everything is filled, grep for `WRITE_HERE_*`.
 2. Run `docker compose up -d` from `./docker/` directory.
 3. Run the `create_user.sh` script.
 

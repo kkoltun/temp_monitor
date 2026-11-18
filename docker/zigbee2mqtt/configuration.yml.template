@@ -1,0 +1,19 @@
+version: 5
+mqtt:
+  base_topic: zigbee2mqtt
+  server: mqtt://mqtt5:1883
+  user: zigbee2mqtt
+  password: [WRITE_HERE_ZIGBEE2MQTT_PASSWORD]
+serial:
+  port: /dev/ttyACM0
+  adapter: zstack
+advanced:
+  channel: 11
+  network_key: GENERATE
+  pan_id: GENERATE
+  ext_pan_id: GENERATE
+frontend:
+  enabled: true
+  auth_token: [WRITE_HERE_YOUR_FRONTEND_AUTH_TOKEN]
+homeassistant:
+  enabled: false
