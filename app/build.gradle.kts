@@ -8,9 +8,13 @@
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.spring)
 
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+
+    id("org.springframework.boot") version "4.0.1"
+    id("io.spring.dependency-management") version "1.1.7"
 }
 
 repositories {
@@ -19,12 +23,21 @@ repositories {
 }
 
 dependencies {
-    // Use JUnit Jupiter for testing.
-    testImplementation(libs.junit.jupiter)
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")
+    implementation("org.springframework.boot:spring-boot-starter-integration")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-liquibase")
+
+    implementation("org.springframework.integration:spring-integration-mqtt")
+    implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
+
+    implementation("org.xerial:sqlite-jdbc")
+    implementation("org.hibernate.orm:hibernate-community-dialects")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
+    // Use JUnit Jupiter for testing.
+    testImplementation(libs.junit.jupiter)
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -36,7 +49,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "org.example.AppKt"
+    mainClass = "dev.karolkoltun.tempmonitor.TempMonitorApplicationKt"
 }
 
 tasks.named<Test>("test") {

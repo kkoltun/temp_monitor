@@ -25,6 +25,12 @@ Checked on the notebook on 2026-11-18:
 - The stable name is the link under `/dev/serial/by-id/`. The compose file takes it from `DONGLE_PATH` in `docker/.env`. The link's name contains the dongle's serial number, which is why it stays in the ignored `.env`.
 - Inside the container the dongle is mapped to `/dev/ttyACM0`, the port named in Zigbee2MQTT's config. The name only matters inside the container.
 
+## The sensor after a restart
+
+Seen on 2026-11-19: after Zigbee2MQTT restarted, the SNZB-02D had no wireless icon on its screen and sent no readings, even when its readings changed. The pairing was still there. **One short press of its button** made it rejoin. Holding the button for 5 seconds would start a new pairing, which isn't needed here.
+
+The coordinator firmware is Z-Stack 20210708, which is old for the ZBDongle-P. An update is worth a later slice.
+
 ## Host – Raspberry Pi (later; develop on the notebook first)
 
 | # | Item | Notes | Approx. cost |

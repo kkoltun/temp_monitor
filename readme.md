@@ -4,7 +4,7 @@
 
 * Work in progress.
 * Last done: sensor paired.
-* Next: simple app development.
+* Next: the app recording the readings, designed in [design.md](design.md).
 
 ## General
 
