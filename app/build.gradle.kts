@@ -9,6 +9,7 @@ plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.spring)
+    alias(libs.plugins.kotlin.jpa)
 
     // Apply the application plugin to add support for building a CLI application in Java.
     application
@@ -33,6 +34,8 @@ dependencies {
 
     implementation("org.xerial:sqlite-jdbc")
     implementation("org.hibernate.orm:hibernate-community-dialects")
+
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
