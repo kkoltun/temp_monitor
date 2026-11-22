@@ -16,6 +16,8 @@ plugins {
 
     id("org.springframework.boot") version "4.0.1"
     id("io.spring.dependency-management") version "1.1.7"
+
+    kotlin("plugin.serialization") version "2.4.21"
 }
 
 repositories {
@@ -36,6 +38,8 @@ dependencies {
     implementation("org.hibernate.orm:hibernate-community-dialects")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
