@@ -3,7 +3,7 @@
 --changeset temp_monitor:002-add-device-location-table
 CREATE TABLE device_location
 (
-    id       INTEGER PRIMARY KEY,
+    id       BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     device   TEXT NOT NULL,
     location TEXT NOT NULL,
     UNIQUE (device)

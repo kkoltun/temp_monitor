@@ -2,8 +2,8 @@
 
 > Written by AI (Claude), from the design agreed with the user on Thu 19 Nov 2026.
 
-The app records the readings of the sensors and, later, shows them as graphs. This file covers recording; the graphs
-get designed once readings are stored.
+The app records the readings of the sensors, and Grafana shows them as graphs. This file covers recording and the
+choice of the graphs.
 
 ## The flow
 
@@ -57,12 +57,15 @@ another thread.
 - **Async on Boot's `applicationTaskExecutor`** (8 threads by default). `@Async` needs `@EnableAsync` and a call from
   another bean, because it works through the Spring proxy.
 - **MQTT client: Spring Integration MQTT** (an inbound channel adapter that wraps Paho).
-- **Database: SQLite**, one file on the device, with WAL mode and a `busy_timeout`, so that a second writer waits
-  instead of failing. Boot has no SQLite support out of the box: JPA needs `hibernate-community-dialects`, while
-  `JdbcClient` needs nothing extra.
-- **Persistence: Spring Data JPA** with the SQLite dialect from `hibernate-community-dialects` (decided on Thu 19 Nov
-  2026). The user prefers repositories and native queries to `JdbcClient`; Spring Data JDBC was dropped because it has
-  no SQLite dialect. IDs are `INTEGER PRIMARY KEY` columns with `GenerationType.IDENTITY`.
+- **Database: PostgreSQL in Docker** (decided on Mon 23 Nov 2026, replacing SQLite). Grafana reads Postgres with
+  its built-in data source, while SQLite needs a community plugin and a shared file mount. The readings already in
+  SQLite (about one day) were not copied over (decided on Mon 23 Nov 2026).
+- **Persistence: Spring Data JPA** (decided on Thu 19 Nov 2026). The user prefers repositories and native queries to
+  `JdbcClient`. Before the move to Postgres it used the SQLite dialect from `hibernate-community-dialects`, because
+  Spring Data JDBC has no SQLite dialect. IDs use `GenerationType.IDENTITY`.
+- **Graphs: Grafana in Docker** (decided on Mon 23 Nov 2026), not an own frontend. A working product first: the
+  graphs are configuration, not code, so the app stays the recording side. An own page can still come later on top of
+  the same tables. Grafana logs in to Postgres as a read-only role.
 - **Schema: Liquibase**, run by Boot at startup (`spring-boot-starter-liquibase`), changelogs in
   `src/main/resources/db/changelog/`.
 

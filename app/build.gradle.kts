@@ -34,8 +34,7 @@ dependencies {
     implementation("org.springframework.integration:spring-integration-mqtt")
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
 
-    implementation("org.xerial:sqlite-jdbc")
-    implementation("org.hibernate.orm:hibernate-community-dialects")
+    implementation("org.postgresql:postgresql:42.7.14")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 

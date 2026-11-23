@@ -3,13 +3,13 @@
 --changeset temp_monitor:003-add-reading-table
 CREATE TABLE reading
 (
-    id                INTEGER PRIMARY KEY,
-    source_message_id INTEGER   NOT NULL,
-    value             REAL      NOT NULL,
-    unit              TEXT      NOT NULL,
-    location          TEXT      NOT NULL,
-    stamp             TIMESTAMP NOT NULL,
-    type              TEXT      NOT NULL
+    id                BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    source_message_id BIGINT                      NOT NULL,
+    value             FLOAT                       NOT NULL,
+    unit              TEXT                        NOT NULL,
+    location          TEXT                        NOT NULL,
+    stamp             TIMESTAMP WITH TIME ZONE NOT NULL,
+    type              TEXT                        NOT NULL
 );
 
 --rollback DROP TABLE reading;

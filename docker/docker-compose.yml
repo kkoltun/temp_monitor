@@ -30,6 +30,19 @@ services:
     pre_start:
       - command: sh -c 'touch /mosquitto/config/pwfile && chmod 0700 /mosquitto/config/pwfile'
         user: mosquitto
+  postgres:
+    image: postgres:19.0-alpine
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
+      POSTGRES_DB: temp-monitor
+      POSTGRES_APP_PASSWORD: ${POSTGRES_APP_PASSWORD}
+      POSTGRES_GRAFANA_PASSWORD: ${POSTGRES_GRAFANA_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql
+      - ./postgres/init-app-user.sh:/docker-entrypoint-initdb.d/init-app-user.sh:ro
 
 # volumes for mapping data,config and log
 volumes:
@@ -37,6 +50,7 @@ volumes:
   mqtt5-data:
   mqtt5-log:
   zigbee2mqtt-data:
+  postgres-data:
 
 networks:
   default:
