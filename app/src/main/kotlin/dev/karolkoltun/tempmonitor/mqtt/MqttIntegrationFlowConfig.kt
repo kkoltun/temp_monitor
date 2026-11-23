@@ -1,4 +1,4 @@
-package dev.karolkoltun.tempmonitor
+package dev.karolkoltun.tempmonitor.mqtt
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.springframework.context.annotation.Bean
@@ -15,12 +15,14 @@ class MqttIntegrationFlowConfig {
         mqttCredentials: MqttCredentials,
         mqttMessageService: MqttMessageService
     ): IntegrationFlow {
-        val options = MqttConnectOptions()
-        options.userName = mqttCredentials.userName
-        options.password = mqttCredentials.password.toCharArray()
+        val options = MqttConnectOptions().apply {
+            userName = mqttCredentials.userName
+            password = mqttCredentials.password.toCharArray()
+        }
 
-        val factory = DefaultMqttPahoClientFactory()
-        factory.connectionOptions = options
+        val factory = DefaultMqttPahoClientFactory().apply {
+            connectionOptions = options
+        }
 
         val channelAdapter = MqttPahoMessageDrivenChannelAdapter(
             mqttProperties.url,

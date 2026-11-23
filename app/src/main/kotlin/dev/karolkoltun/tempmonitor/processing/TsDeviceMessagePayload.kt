@@ -12,6 +12,5 @@ data class TsDeviceMessagePayload(
     val battery: Int,
     val humidity: Double,
     val temperature: Double,
-    @SerialName("temperature_units") val temperatureUnits: String,
     @SerialName("linkquality") val linkQuality: Int
 )

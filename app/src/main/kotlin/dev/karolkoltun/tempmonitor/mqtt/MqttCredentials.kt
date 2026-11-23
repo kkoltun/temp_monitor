@@ -1,4 +1,4 @@
-package dev.karolkoltun.tempmonitor
+package dev.karolkoltun.tempmonitor.mqtt
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 

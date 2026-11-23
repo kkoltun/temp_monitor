@@ -2,98 +2,67 @@ package dev.karolkoltun.tempmonitor.processing
 
 import jakarta.transaction.Transactional
 import kotlinx.serialization.json.Json
+import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 
 @Service
 class ProcessingService(
-    val mqttMessageToProcessRepository: MqttMessageToProcessRepository,
-    val deviceLocationRepository: DeviceLocationRepository,
-    val readingRepository: ReadingRepository
+    private val mqttMessageToProcessRepository: MqttMessageToProcessRepository,
+    private val deviceLocationRepository: DeviceLocationRepository,
+    private val readingRepository: ReadingRepository
 ) {
+
+    companion object {
+        private val log = LoggerFactory.getLogger(ProcessingService::class.java)
+    }
 
     @Async
     @Transactional
     fun processMqttMessage(messageId: Long) {
-        val message = mqttMessageToProcessRepository.findMessageById(messageId)!!
-        println("Found message $message to process")
+        val message = mqttMessageToProcessRepository.findMessageById(messageId)
+            ?: throw IllegalArgumentException("Message to process with id [$messageId] not found")
+
+        log.info("Found message $message to process")
 
         val readings = when (message.device) {
             "TS_1" -> mapTsDeviceMessage(message)
             else -> throw IllegalStateException("Unknown device ${message.device}; message: $message")
         }
 
-        val deviceLocation = deviceLocationRepository.findByDevice(message.device)
+        val location = deviceLocationRepository.findByDevice(message.device)?.location
             ?: throw IllegalStateException("Device ${message.device} location not found")
-        val location = deviceLocation.location
 
-        for (reading in readings) {
-            when (reading) {
-                is Temperature -> readingRepository.save(
-                    ReadingEntity(
-                        null,
-                        messageId,
-                        reading.value,
-                        reading.readingUnit.toString(),
-                        location,
-                        message.created,
-                        reading.type.toString()
-                    )
-                )
+        log.info("Saving ${readings.size} readings: $readings")
 
-                is Humidity -> readingRepository.save(
-                    ReadingEntity(
-                        null,
-                        messageId,
-                        reading.value,
-                        reading.readingUnit,
-                        location,
-                        message.created,
-                        reading.type.toString()
-                    )
-                )
+        readingRepository.saveAll(readings.map { it.toEntity(location, message) })
 
-                is Battery -> readingRepository.save(
-                    ReadingEntity(
-                        null,
-                        messageId,
-                        reading.value.toDouble(),
-                        reading.readingUnit,
-                        location,
-                        message.created,
-                        reading.type.toString()
-                    )
-                )
-
-                is LinkQuality -> readingRepository.save(
-                    ReadingEntity(
-                        null,
-                        messageId,
-                        reading.value.toDouble(),
-                        "",
-                        location,
-                        message.created,
-                        reading.type.toString()
-                    )
-                )
-            }
-        }
+        log.info("Finished processing message $messageId")
     }
 
     private fun mapTsDeviceMessage(messageToProcess: MqttMessageToProcess): List<Reading> {
-        val message = Json.decodeFromString(TsDeviceMessagePayload.serializer(), messageToProcess.payload)
+        val message = Json.decodeFromString<TsDeviceMessagePayload>(messageToProcess.payload)
 
-        println("Parsed message $message")
+        log.info("Parsed message $message")
 
-        val temperature = Temperature(
-            message.temperature,
-            Temperature.ReadingUnit.valueOf(message.temperatureUnits.uppercase())
+        return listOf(
+            Temperature(message.temperature),
+            Humidity(message.humidity),
+            Battery(message.battery.toDouble()),
+            LinkQuality(message.linkQuality.toDouble())
         )
-        val humidity = Humidity(message.humidity)
-        val battery = Battery(message.battery)
-        val linkQuality = LinkQuality(message.linkQuality)
-
-        return listOf(temperature, humidity, battery, linkQuality)
     }
+
+    private fun Reading.toEntity(
+        location: String,
+        message: MqttMessageToProcess
+    ): ReadingEntity = ReadingEntity(
+        sourceMessageId = message.id,
+        value = value,
+        unit = readingUnit.name,
+        location = location,
+        stamp = message.created,
+        type = readingType.name
+    )
 
 }

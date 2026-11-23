@@ -3,8 +3,8 @@
 ## Status
 
 * Work in progress.
-* Last done: grafana.
-* Next: code refactor to make it more Kotlin, less Java.
+* Last done: core app.
+* Next: end to end tests, containerize the app.
 
 ## General
 

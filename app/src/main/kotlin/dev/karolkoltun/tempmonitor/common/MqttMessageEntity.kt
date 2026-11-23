@@ -1,4 +1,4 @@
-package dev.karolkoltun.tempmonitor
+package dev.karolkoltun.tempmonitor.common
 
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue

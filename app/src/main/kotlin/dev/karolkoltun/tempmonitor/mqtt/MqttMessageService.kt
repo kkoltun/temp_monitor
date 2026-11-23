@@ -1,6 +1,8 @@
-package dev.karolkoltun.tempmonitor
+package dev.karolkoltun.tempmonitor.mqtt
 
+import dev.karolkoltun.tempmonitor.common.MqttMessageEntity
 import dev.karolkoltun.tempmonitor.processing.ProcessingService
+import org.slf4j.LoggerFactory
 import org.springframework.messaging.Message
 import org.springframework.messaging.MessageHandler
 import org.springframework.stereotype.Service
@@ -9,16 +11,21 @@ import java.time.Instant
 
 @Service
 class MqttMessageService(
-    val clock: Clock,
-    val mqttProperties: MqttProperties,
-    val repository: MqttMessageRepository,
-    val processingService: ProcessingService
+    private val clock: Clock,
+    private val mqttProperties: MqttProperties,
+    private val repository: MqttMessageRepository,
+    private val processingService: ProcessingService
 ) : MessageHandler {
 
-    override fun handleMessage(message: Message<*>) {
-        println("Handling message $message")
+    companion object {
+        private val log = LoggerFactory.getLogger(MqttMessageService::class.java)
+    }
 
-        val topicName = message.headers.get("mqtt_receivedTopic", String::class.java)!!
+    override fun handleMessage(message: Message<*>) {
+        log.info("Handling message $message")
+
+        val topicName = message.headers.get("mqtt_receivedTopic", String::class.java)
+            ?: throw IllegalArgumentException("Topic not found in headers: ${message.headers}")
 
         val mqttMessageEntity = MqttMessageEntity(
             id = null,
@@ -32,14 +39,14 @@ class MqttMessageService(
         repository.save(mqttMessageEntity)
 
         processingService.processMqttMessage(mqttMessageEntity.id!!)
+
+        log.info("Finished handling message; assigned id ${mqttMessageEntity.id}")
     }
 
     private fun parseDevice(topic: String): String {
-        if (!topic.startsWith(mqttProperties.topicPrefix)) {
-            throw IllegalArgumentException("Topic $topic has unexpected structure - no ${mqttProperties.topicPrefix}")
-        }
+        require(topic.startsWith(mqttProperties.topicPrefix)) { "Topic $topic has unexpected structure - no ${mqttProperties.topicPrefix}" }
 
-        return topic.removePrefix(mqttProperties.topicPrefix);
+        return topic.removePrefix(mqttProperties.topicPrefix)
     }
 
 }

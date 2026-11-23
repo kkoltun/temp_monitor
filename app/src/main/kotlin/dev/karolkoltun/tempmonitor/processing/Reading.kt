@@ -1,6 +1,16 @@
 package dev.karolkoltun.tempmonitor.processing
 
-sealed interface Reading
+sealed interface Reading {
+    val value: Double
+    val readingUnit: ReadingUnit
+    val readingType: ReadingType
+}
+
+enum class ReadingUnit {
+    CELSIUS,
+    PERCENT,
+    NONE
+}
 
 enum class ReadingType {
     TEMPERATURE,
@@ -10,31 +20,29 @@ enum class ReadingType {
 }
 
 data class Temperature(
-    val value: Double,
-    val readingUnit: ReadingUnit,
-    val type: ReadingType = ReadingType.TEMPERATURE
+    override val value: Double
 ) : Reading {
-
-    enum class ReadingUnit {
-        FAHRENHEIT,
-        CELSIUS
-    }
-
+    override val readingUnit: ReadingUnit = ReadingUnit.CELSIUS
+    override val readingType: ReadingType = ReadingType.TEMPERATURE
 }
 
 data class Humidity(
-    val value: Double,
-    val readingUnit: String = "PERCENT",
-    val type: ReadingType = ReadingType.HUMIDITY
-) : Reading
+    override val value: Double
+) : Reading {
+    override val readingUnit: ReadingUnit = ReadingUnit.PERCENT
+    override val readingType: ReadingType = ReadingType.HUMIDITY
+}
 
 data class Battery(
-    val value: Int,
-    val readingUnit: String = "PERCENT",
-    val type: ReadingType = ReadingType.BATTERY
-) : Reading
+    override val value: Double
+) : Reading {
+    override val readingUnit: ReadingUnit = ReadingUnit.PERCENT
+    override val readingType: ReadingType = ReadingType.BATTERY
+}
 
 data class LinkQuality(
-    val value: Int,
-    val type: ReadingType = ReadingType.LINK_QUALITY
-) : Reading
+    override val value: Double,
+) : Reading {
+    override val readingUnit: ReadingUnit = ReadingUnit.NONE
+    override val readingType: ReadingType = ReadingType.LINK_QUALITY
+}
