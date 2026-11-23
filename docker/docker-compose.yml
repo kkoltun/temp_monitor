@@ -4,7 +4,7 @@ services:
     image: ghcr.io/koenkk/zigbee2mqtt:2.14.3
     container_name: zigbee2mqtt
     ports:
-      - "8081:8080"
+      - "127.0.0.1:8081:8080"
     devices:
       - ${DONGLE_PATH}:/dev/ttyACM0
     volumes:
@@ -14,13 +14,11 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Europe/Warsaw
-  # mqtt5 eclipse-mosquitto
   mqtt5:
     image: eclipse-mosquitto:2.1.4-alpine
     container_name: mqtt5
     ports:
-      - "1883:1883" #default mqtt port
-      - "9001:9001" #default mqtt port for websockets
+      - "127.0.0.1:1883:1883"
     volumes:
       - mqtt5-config:/mosquitto/config:rw
       - mqtt5-data:/mosquitto/data:rw
@@ -33,7 +31,7 @@ services:
   postgres:
     image: postgres:19.0-alpine
     ports:
-      - 5432:5432
+      - "127.0.0.1:5432:5432"
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
@@ -43,6 +41,19 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql
       - ./postgres/init-app-user.sh:/docker-entrypoint-initdb.d/init-app-user.sh:ro
+    restart: unless-stopped
+  grafana:
+    image: grafana/grafana:13.2
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      - "GF_PATHS_CONFIG=/custom_config.ini"
+      - "POSTGRES_GRAFANA_PASSWORD=${POSTGRES_GRAFANA_PASSWORD}"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/custom_config.ini:/custom_config.ini
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    restart: unless-stopped
 
 # volumes for mapping data,config and log
 volumes:
@@ -51,6 +62,7 @@ volumes:
   mqtt5-log:
   zigbee2mqtt-data:
   postgres-data:
+  grafana-data:
 
 networks:
   default:

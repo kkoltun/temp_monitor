@@ -1,0 +1,18 @@
+# Grafana reads this at startup and creates the data source with a fixed uid,
+# so dashboards point at the same data source on every machine.
+# The password comes from the container's environment, not from this file.
+# AI CREATED
+apiVersion: 1
+
+datasources:
+  - name: temp-monitor
+    type: grafana-postgresql-datasource
+    uid: temp-monitor-postgres
+    url: postgres:5432
+    user: grafana
+    isDefault: true
+    jsonData:
+      database: temp-monitor
+      sslmode: disable
+    secureJsonData:
+      password: $POSTGRES_GRAFANA_PASSWORD
