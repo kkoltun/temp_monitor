@@ -3,12 +3,14 @@
 ## Status
 
 * Work in progress.
-* Last done: sensor paired.
-* Next: the app recording the readings, designed in [design.md](design.md).
+* Last done: grafana.
+* Next: code refactor to make it more Kotlin, less Java
 
 ## General
 
-A small solution for temperature monitoring at home.
+A small solution for temperature & other values monitoring at home.
+
+![img.png](img.png)
 
 Key ideas:
 
