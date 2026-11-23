@@ -4,11 +4,13 @@
 
 * Work in progress.
 * Last done: grafana.
-* Next: code refactor to make it more Kotlin, less Java
+* Next: code refactor to make it more Kotlin, less Java.
 
 ## General
 
 A small solution for temperature & other values monitoring at home.
+
+Example dashboard:
 
 ![img.png](img.png)
 
