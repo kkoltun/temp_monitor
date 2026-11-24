@@ -31,6 +31,50 @@ Seen on 2026-11-19: after Zigbee2MQTT restarted, the SNZB-02D had no wireless ic
 
 The coordinator firmware is Z-Stack 20210708, which is old for the ZBDongle-P. An update is worth a later slice.
 
+## The boiler and its thermostat
+
+Seen on 2026-11-24 (from photos, which are not in the repository):
+
+- The boiler is **heating only**: it heats the radiators and no tap water. The water pipe going into it only tops up the circuit when the pressure drops.
+- The thermostat is an **Auraton 2005 TX/RX**. The battery transmitter sends on/off by radio. The receiver ("AURATON RX") plugs into a wall socket, and a cable runs from it to the boiler's room-thermostat input. It works as a simple on/off contact.
+- The boiler's power cord seems to go to the same wall socket, so the boiler plugs in rather than being hard-wired (to confirm).
+
+### Ways to tell when the heating is on
+
+Because the boiler heats nothing but the radiators, every option below measures heating only.
+
+1. **A temperature probe clamped to the heating flow pipe** (chosen on 2026-11-24, plan below). The copper pipes under the boiler are bare, and the arrows on the mounting bracket show which outlet is which. It shows the burner's real cycles, about a minute late.
+2. **A Zigbee plug that measures power**, if the boiler really does plug in. The pump's power use jumps when heating runs. The pump may keep running for a short while after the burner stops. The plug also strengthens the Zigbee mesh near the boiler.
+3. **Listening to the Auraton's radio** with an RTL-SDR and `rtl_433`. Support for this model is not confirmed, so the signal may need decoding by hand. It shows when the thermostat asks for heat, not when the burner fires.
+4. **Later, for control:** a Zigbee dry-contact relay in place of the Auraton receiver.
+
+Options 3 and 4 are bigger projects. Option 3 means decoding an unknown radio protocol. Option 4 makes the app the thermostat, with schedules, hysteresis and a safe fallback for when it goes down.
+
+### Plan: the flow-pipe sensor (agreed on 2026-11-24)
+
+**The sensor:** a **Sonoff SNZB-02LD**, the Zigbee version with a probe.
+
+- Its probe is rated −40 to 115 °C, according to retailer listings. The main unit only handles −10 to 60 °C, so it stays away from the boiler.
+- Zigbee2MQTT has supported it since version 2.3.0, and the compose file pins 2.14.3.
+
+Steps:
+
+1. **Range test before buying anything.** Put the SNZB-02D next to the boiler and press its button once, so it rejoins. Watch whether its readings keep arriving and what `linkquality` they carry. The *Map* view in the Zigbee2MQTT frontend shows how it connects.
+2. **Buy and pair** the SNZB-02LD, with a friendly name that has no `/`. Watch its payload with `mosquitto_sub`. Expect temperature, battery and link quality, but no humidity.
+3. **Check how often it reports.** Warm the probe, or wait for the heating to start, and watch how often messages arrive. If they are too sparse to catch the burner switching, look at the device's reporting settings in Zigbee2MQTT.
+4. **Mount it.** Tape the probe firmly to the bare copper flow pipe near the boiler outlet, with insulation wrapped over it, so it reads the pipe and not the room. Keep the main unit away from the boiler's heat.
+5. **The app.** A new kind of device means a new mapper and payload shape. The reading is still a `Temperature`. The `device_location` row (e.g. "heating flow") is added by hand.
+6. **Grafana.** First a graph of the flow temperature. After a few real heating cycles, a state-timeline panel with an on/off threshold. The threshold comes from real data, not a guess.
+7. **Later, a separate slice:** heating periods computed by the app into their own table, for numbers such as hours of heating per day.
+
+### If the boiler is too far from the dongle: a repeater
+
+- **Only mains-powered Zigbee devices relay** (routers). Battery devices are end devices and never relay. Any Zigbee smart plug works as a router.
+- **The router must reach the dongle itself.** Put it somewhere between the two, not next to the boiler.
+- **A battery sensor keeps the parent it joined through.** After adding a router, press the sensor's button once so it rejoins. Then check on the *Map* that it now goes through the router.
+- **Cheap combination:** a power-metering Zigbee plug as the router. If it reaches the dongle from the boiler's socket, the boiler plugs into it, which also gives option 2's pump signal.
+- On the Raspberry Pi, a central place for the Pi with the dongle on its USB extension may make the repeater unnecessary.
+
 ## Host – Raspberry Pi (later; develop on the notebook first)
 
 | # | Item | Notes | Approx. cost |
