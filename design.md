@@ -69,12 +69,40 @@ another thread.
 - **Schema: Liquibase**, run by Boot at startup (`spring-boot-starter-liquibase`), changelogs in
   `src/main/resources/db/changelog/`.
 
+## The outside temperature (planned on Thu 26 Nov 2026 by the user)
+
+```
+@Scheduled poll, every 15 minutes
+        │
+        ▼
+IMGW-PIB synop API, one station (the station is kept out of the repository)
+        │
+        ▼
+save the raw response into synop_service_response
+        │
+        ▼
+ProcessingService, a new method taking that row's id
+  a new mapper: response → List<Reading>
+  save the readings, reading.source = EXTERNAL_TEMP_SERVICE
+```
+
+- **The raw response kept** in its own table `synop_service_response`, like `mqtt_message` for the sensors.
+  The `synop` endpoint returns only the latest hour, so an old response cannot be fetched again.
+- **A `source` column on `reading`** (`MQTT_MESSAGE`, `EXTERNAL_TEMP_SERVICE`) says which table `source_message_id` points
+  at. The database cannot enforce that with a foreign key.
+- **Every 15 minutes.** IMGW publishes one value per station per hour, some time after the full hour. A failed call
+  is retried by the next run.
+- **`stamp` from the response**: `data_pomiaru` and `godzina_pomiaru`, the hour in UTC. The values in the response
+  are strings, numbers included.
+- **The station is a secret.** It reveals roughly where the home is, so it goes into the ignored properties.
+
 ## Tables
 
 | Table | Columns |
 |-------|---------|
 | `mqtt_message` | id, topic, device, payload (TEXT, JSON), headers (TEXT), created |
-| `reading` | id, source_message_id (the `mqtt_message` it came from), value, unit, location, stamp, type |
+| `reading` | id, source_message_id (the row it came from), source (`MQTT_MESSAGE`, `EXTERNAL_TEMP_SERVICE`), value, unit, location, stamp, type |
+| `synop_service_response` | planned: the raw IMGW response and its stamp |
 | `device_location` | id, device (unique), location |
 
 ## Accepted for now
@@ -82,3 +110,10 @@ another thread.
 - **The in-memory handoff to the async thread is lost on a crash.** A message saved just before the app dies is
   not processed. If that is ever needed, a catch-up job can find raw rows with no processed row (a left join on
   `reading.source_message_id`) and process them. It would run rarely, e.g. at startup, not per reading.
+- **The processing package knows every source** (noted by the user on Thu 26 Nov 2026). It holds the entities and
+  mappers of both MQTT messages and synop responses, and someone adding another weather service would not know what to
+  implement where. To refactor later toward clear plugging places for a new source.
+- **Duplicate outside readings** (accepted by the user on Thu 26 Nov 2026). Every poll saves the response and its
+  readings, but IMGW publishes once an hour, so each hour is stored about four times with the same values. Graphs and
+  averages are unaffected. A fix on a lower priority: skip a response whose stamp is already processed, in the
+  processing service. A longer interval alone cannot give exactly one row per hour.

@@ -1,6 +1,7 @@
 package dev.karolkoltun.tempmonitor.processing
 
 import jakarta.persistence.*
+import jakarta.persistence.EnumType.STRING
 import jakarta.persistence.GenerationType.IDENTITY
 import java.time.Instant
 
@@ -13,5 +14,12 @@ class ReadingEntity(
     var unit: String,
     var location: String,
     var stamp: Instant,
-    var type: String
+    var type: String,
+    @Enumerated(STRING)
+    var source: ReadingSource
 )
+
+enum class ReadingSource {
+    MQTT_MESSAGE,
+    SYNOPTIC_SERVICE_RESPONSE
+}

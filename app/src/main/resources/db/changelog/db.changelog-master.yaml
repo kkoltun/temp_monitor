@@ -5,3 +5,7 @@ databaseChangeLog:
       file: classpath:db/changelog/changes/002-add-device-location-table.sql
   - include:
       file: classpath:db/changelog/changes/003-add-reading-table.sql
+  - include:
+      file: classpath:db/changelog/changes/004-add-synoptic-service-response-table.sql
+  - include:
+      file: classpath:db/changelog/changes/005-add-reading-source-column.sql

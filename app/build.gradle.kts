@@ -30,6 +30,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-integration")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-liquibase")
+    implementation("org.springframework.boot:spring-boot-restclient")
 
     implementation("org.springframework.integration:spring-integration-mqtt")
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
