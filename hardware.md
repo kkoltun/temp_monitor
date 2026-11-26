@@ -54,6 +54,8 @@ Options 3 and 4 are bigger projects. Option 3 means decoding an unknown radio pr
 
 **The sensor:** a **Sonoff SNZB-02LD**, the Zigbee version with a probe.
 
+**Ordered on 2026-11-25: two** (61.10 zł each), one for the flow pipe and one for the return pipe. The flow alone shows when the boiler heats and how hot the water it sends is. The return adds the difference between them (ΔT): how much heat the radiators gave off, whether the circuit is balanced, and whether the water coming back to this non-condensing boiler is cold enough to make the flue gases condense. The range test in step 1 now only decides whether a repeater is needed.
+
 - Its probe is rated −40 to 115 °C, according to retailer listings. The main unit only handles −10 to 60 °C, so it stays away from the boiler.
 - Zigbee2MQTT has supported it since version 2.3.0, and the compose file pins 2.14.3.
 
@@ -62,7 +64,7 @@ Steps:
 1. **Range test before buying anything.** Put the SNZB-02D next to the boiler and press its button once, so it rejoins. Watch whether its readings keep arriving and what `linkquality` they carry. The *Map* view in the Zigbee2MQTT frontend shows how it connects.
 2. **Buy and pair** the SNZB-02LD, with a friendly name that has no `/`. Watch its payload with `mosquitto_sub`. Expect temperature, battery and link quality, but no humidity.
 3. **Check how often it reports.** Warm the probe, or wait for the heating to start, and watch how often messages arrive. If they are too sparse to catch the burner switching, look at the device's reporting settings in Zigbee2MQTT.
-4. **Mount it.** Tape the probe firmly to the bare copper flow pipe near the boiler outlet, with insulation wrapped over it, so it reads the pipe and not the room. Keep the main unit away from the boiler's heat.
+4. **Mount them.** Tape each probe firmly to its bare copper pipe (flow and return) near the boiler, with insulation wrapped over it, so it reads the pipe and not the room. Keep the main unit away from the boiler's heat.
 5. **The app.** A new kind of device means a new mapper and payload shape. The reading is still a `Temperature`. The `device_location` row (e.g. "heating flow") is added by hand.
 6. **Grafana.** First a graph of the flow temperature. After a few real heating cycles, a state-timeline panel with an on/off threshold. The threshold comes from real data, not a guess.
 7. **Later, a separate slice:** heating periods computed by the app into their own table, for numbers such as hours of heating per day.
@@ -100,14 +102,14 @@ After that, deploys leave the Zigbee state alone, as long as they update the sam
 - **Sonoff Dongle-PZG23**: a Z-Wave stick, not Zigbee. It won't work with the SNZB-02D.
 - Anything labelled **"Z-Wave"** or **"800 series"**.
 - **SNZB-02P / SNZB-02**: no screen.
-- **SNZB-02LD**: waterproof probe, meant for fridges and pools.
+- **SNZB-02LD** for rooms: its waterproof probe is meant for fridges, pools and pipes. Here it is used only on the heating pipes (see *The boiler and its thermostat*).
 - Sensors that only work through a vendor cloud app.
 
 Before ordering, check the exact model on https://www.zigbee2mqtt.io/supported-devices/
 
 ## Later (after the first sensor works)
 
-- 3× more SNZB-02D for the remaining rooms.
+- 3× more SNZB-02D for the remaining rooms: ordered on 2026-11-25 (49.30 zł each).
 - A Zigbee smart plug as a repeater, if a room is out of range.
 - Maybe an SNZB-02WD (outdoor, IP65) for an outside temperature reading.
 - For boiler control: a Zigbee relay and/or Zigbee radiator valves (TRVs). Check the boiler wiring first.
